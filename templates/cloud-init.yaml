@@ -1,0 +1,58 @@
+#cloud-config
+
+fqdn: github-runner-${unique_id}.${domain}
+hostname: github-runner-${unique_id}
+prefer_fqdn_over_hostname: true
+create_hostname_file: true
+
+ssh_authorized_keys:
+  - ${ssh_public_key}
+
+write_files:
+  - content: |
+      #!/bin/bash -ex
+
+      set -o pipefail
+
+      RUNNER_ORG=${github_org}
+      RUNNER_TOKEN=${token}
+      RUNNER_LABELS=${runner_labels}
+      RUNNER_VERSION=${runner_version}
+
+      # Install docker, then additional packages
+      apt update -qq
+      apt install -y ruby awscli
+      curl https://nodejs.org/dist/v20.9.0/node-v20.9.0-linux-x64.tar.xz | tar -xJf - --strip=1 -C /usr/local/
+
+      curl https://get.docker.com | sh
+
+      cat > /etc/cron.daily/docker-prune <<EOF
+      docker image prune -a --filter="until=96h" --force
+      docker volume prune --force
+      EOF
+      chmod a+x /etc/cron.daily/docker-prune
+
+      # Create dedicated user
+      useradd -m -d /home/runner -s /bin/bash runner
+      usermod -G docker runner
+
+      # Download and install runner
+      cd /home/runner
+      mkdir -p actions-runner
+      cd actions-runner
+      curl -o actions-runner-linux-x64-$RUNNER_VERSION.tar.gz -L https://github.com/actions/runner/releases/download/v$RUNNER_VERSION/actions-runner-linux-x64-$RUNNER_VERSION.tar.gz
+      tar xzf ./actions-runner-linux-x64-$RUNNER_VERSION.tar.gz
+
+      # Configure runner
+      su - runner -c "/home/runner/actions-runner/config.sh --url https://github.com/$RUNNER_ORG --token $RUNNER_TOKEN --labels $RUNNER_LABELS --unattended"
+
+      # Setup systemd service
+      cd /home/runner/actions-runner/
+      ./svc.sh install runner
+      ./svc.sh start
+      ./svc.sh status
+    path: /opt/install_runner.sh
+    permissions: '0755'
+
+runcmd:
+  - bash /opt/install_runner.sh

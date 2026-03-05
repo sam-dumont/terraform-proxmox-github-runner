@@ -1,0 +1,18 @@
+proxmox_host             = "proxmox.example.com"
+proxmox_node             = "proxmox"
+proxmox_api_token_id     = "terraform@pve!mytoken"
+proxmox_api_token_secret = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+proxmox_template         = "ubuntu2410"
+
+github_org   = "my-org"
+github_token = "ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+domain         = "example.com"
+vm_ip          = "10.20.254.10/24"
+vm_gateway     = "10.20.254.1"
+vm_cores       = 2
+vm_memory      = 4096
+vm_disk_size   = "32G"
+ssh_public_key = "ssh-rsa AAAAB3... user@hostname"
+runner_labels  = "self-hosted,x64,docker"
+runner_version = "2.321.0"
