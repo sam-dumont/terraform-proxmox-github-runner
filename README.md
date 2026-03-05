@@ -40,7 +40,7 @@ provider "github" {
 
 module "github_runner" {
   source  = "sam-dumont/github-runner/proxmox"
-  version = "~> 1.0"
+  version = "~> 0.1"
 
   proxmox_host     = "proxmox.example.com"
   proxmox_node     = "pve"
