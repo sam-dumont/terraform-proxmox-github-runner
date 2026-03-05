@@ -1,6 +1,6 @@
 # terraform-proxmox-github-runner
 
-Terraform configuration to deploy self-hosted GitHub Actions runners as Proxmox VMs, using cloud-init.
+Terraform module to deploy self-hosted GitHub Actions runners as Proxmox VMs, using cloud-init.
 
 Each `terraform apply` creates a fresh Ubuntu VM on Proxmox, injects a cloud-init script that installs Docker and registers the VM as an organization-level GitHub Actions runner. The runner token is fetched automatically via the GitHub provider, and the VM gets a unique name via `random_pet` (so you can run multiple runners side by side).
 
@@ -27,17 +27,26 @@ When the runner token changes (because it expired), `random_pet` generates a new
 ## Usage
 
 ```hcl
+provider "proxmox" {
+  pm_api_url          = "https://proxmox.example.com:8006/api2/json"
+  pm_api_token_id     = var.proxmox_token_id
+  pm_api_token_secret = var.proxmox_token_secret
+}
+
+provider "github" {
+  owner = "my-org"
+  token = var.github_pat
+}
+
 module "github_runner" {
-  source = "github.com/sam-dumont/terraform-proxmox-github-runner"
+  source  = "sam-dumont/github-runner/proxmox"
+  version = "~> 1.0"
 
-  proxmox_host             = "proxmox.example.com"
-  proxmox_node             = "pve"
-  proxmox_api_token_id     = var.proxmox_token_id
-  proxmox_api_token_secret = var.proxmox_token_secret
-  proxmox_template         = "ubuntu2410"
+  proxmox_host     = "proxmox.example.com"
+  proxmox_node     = "pve"
+  proxmox_template = "ubuntu2410"
 
-  github_org   = "my-org"
-  github_token = var.github_pat
+  github_org = "my-org"
 
   domain         = "example.com"
   vm_ip          = "10.0.1.50/24"
@@ -58,8 +67,8 @@ module "github_runner" {
 | Name | Version |
 |------|---------|
 | terraform | >= 1.3 |
-| proxmox ([telmate/proxmox](https://registry.terraform.io/providers/Telmate/proxmox/latest)) | >= 3.0 |
-| github ([integrations/github](https://registry.terraform.io/providers/integrations/github/latest)) | >= 6.0 |
+| [proxmox](https://registry.terraform.io/providers/Telmate/proxmox/latest) (telmate/proxmox) | >= 3.0 |
+| [github](https://registry.terraform.io/providers/integrations/github/latest) (integrations/github) | >= 6.0 |
 | random | >= 3.0 |
 | local | >= 2.0 |
 | null | >= 3.0 |
@@ -90,11 +99,8 @@ module "github_runner" {
 |------|-------------|------|---------|:--------:|
 | `proxmox_host` | Proxmox host FQDN or IP | `string` | n/a | **yes** |
 | `proxmox_node` | Proxmox node name to deploy the VM on | `string` | `"proxmox"` | no |
-| `proxmox_api_token_id` | Proxmox API token ID (e.g. `terraform@pve!mytoken`) | `string` | n/a | **yes** |
-| `proxmox_api_token_secret` | Proxmox API token secret | `string` | n/a | **yes** |
 | `proxmox_template` | Name of the Proxmox VM template to clone | `string` | `"ubuntu2410"` | no |
 | `github_org` | GitHub organization name for the runner | `string` | n/a | **yes** |
-| `github_token` | GitHub PAT with `admin:org` scope for runner registration | `string` | n/a | **yes** |
 | `domain` | Base domain for the runner VM FQDN | `string` | `"example.com"` | no |
 | `vm_ip` | Static IP for the runner VM in CIDR notation | `string` | `"10.20.254.10/24"` | no |
 | `vm_gateway` | Gateway IP for the runner VM network | `string` | `"10.20.254.1"` | no |

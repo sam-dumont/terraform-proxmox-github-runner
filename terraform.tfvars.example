@@ -1,11 +1,8 @@
-proxmox_host             = "proxmox.example.com"
-proxmox_node             = "proxmox"
-proxmox_api_token_id     = "terraform@pve!mytoken"
-proxmox_api_token_secret = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-proxmox_template         = "ubuntu2410"
+proxmox_host     = "proxmox.example.com"
+proxmox_node     = "proxmox"
+proxmox_template = "ubuntu2410"
 
-github_org   = "my-org"
-github_token = "ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+github_org = "my-org"
 
 domain         = "example.com"
 vm_ip          = "10.20.254.10/24"

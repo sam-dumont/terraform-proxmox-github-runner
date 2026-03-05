@@ -9,18 +9,6 @@ variable "proxmox_node" {
   default     = "proxmox"
 }
 
-variable "proxmox_api_token_id" {
-  type        = string
-  description = "Proxmox API token ID (e.g. terraform@pve!mytoken)"
-  sensitive   = true
-}
-
-variable "proxmox_api_token_secret" {
-  type        = string
-  description = "Proxmox API token secret"
-  sensitive   = true
-}
-
 variable "proxmox_template" {
   type        = string
   description = "Name of the Proxmox VM template to clone"
@@ -30,12 +18,6 @@ variable "proxmox_template" {
 variable "github_org" {
   type        = string
   description = "GitHub organization name for the runner"
-}
-
-variable "github_token" {
-  type        = string
-  description = "GitHub PAT with admin:org scope for runner registration"
-  sensitive   = true
 }
 
 variable "domain" {

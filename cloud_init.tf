@@ -1,5 +1,3 @@
-data "github_actions_organization_registration_token" "runner" {}
-
 resource "local_sensitive_file" "cloud_init" {
   content = templatefile("${path.module}/templates/cloud-init.yaml", {
     token          = data.github_actions_organization_registration_token.runner.token
